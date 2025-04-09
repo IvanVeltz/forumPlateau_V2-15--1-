@@ -14,7 +14,7 @@ class PostManager extends Manager{
         parent::connect();
     }
 
-    // récupérer tous les topics d'une catégorie spécifique (par son id)
+    // récupérer tous les posts d'un topic spécifique (par son id)
     public function findPostsByTopic($id) {
 
         $sql = "SELECT * 
