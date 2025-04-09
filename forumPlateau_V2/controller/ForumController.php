@@ -61,4 +61,53 @@ class ForumController extends AbstractController implements ControllerInterface{
         ];
 
     }
+
+    public function addPost($id){
+        
+        if(isset($_POST['submit'])){
+            $text = filter_input(INPUT_POST, "text", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $data = [
+                "text" => $text, 
+                "creationDate" => date("Y-m-d H:i:s"),
+                "user_id" => 2, 
+                "topic_id" => $id
+            ];
+            $postManager = new PostManager();
+            $postManager->add($data);
+
+            // On rappele la vue 
+            $this->redirectTo("forum", "listPostsByTopic", $id);
+
+        }
+    }
+
+    public function addTopic($id){
+        
+        if(isset($_POST['submit'])){
+            $title = filter_input(INPUT_POST, "title", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $text = filter_input(INPUT_POST, "text", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            
+            $dataTopic = [
+                "title" => $title,
+                "creationDate" => date("Y-m-d H:i:s"),
+                "user_id" => 2,
+                "category_id" => $id
+            ];
+            
+            $topicManager = new TopicManager();
+            $topic = $topicManager->add($dataTopic);
+
+            $dataPost = [
+                "text" => $text, 
+                "creationDate" => date("Y-m-d H:i:s"),
+                "user_id" => 2, 
+                "topic_id" => $topic
+            ];
+            $postManager = new PostManager();
+            $postManager->add($dataPost);
+
+            $this->redirectTo("forum", "listTopicsByCategory", $id);
+
+        }
+    }
 }

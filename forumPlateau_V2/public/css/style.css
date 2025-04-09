@@ -7,3 +7,17 @@
 h1 {
     color: rgb(0, 122, 156);
 }
+
+form{
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+}
+
+textarea {
+    resize: none;
+}
+
+form button{
+    width: fit-content;
+}
