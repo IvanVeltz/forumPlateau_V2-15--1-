@@ -52,6 +52,15 @@ final class Post extends Entity{
         return $this;
     }
 
+    public function getCreationDate(){
+        return $this->creationDate;
+    }
+
+    public function setCreationDate($creationDate){
+        $this->creationDate = $creationDate;
+        return $this;
+    }
+
     public function __toString(){
         return $this->text;
     }
