@@ -64,12 +64,13 @@ class ForumController extends AbstractController implements ControllerInterface{
 
     public function addPost($id){
         
-        if(isset($_POST['submit'])){
+        if(isset($_POST['submit']) && (Session::getUser())){
             $text = filter_input(INPUT_POST, "text", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $user = Session::getUser();
             $data = [
                 "text" => $text, 
                 "creationDate" => date("Y-m-d H:i:s"),
-                "user_id" => 2, 
+                "user_id" => $user->getId(), 
                 "topic_id" => $id
             ];
             $postManager = new PostManager();
@@ -81,16 +82,30 @@ class ForumController extends AbstractController implements ControllerInterface{
         }
     }
 
+    public function deletePost($id){
+        if (isset($_POST['submit']) && Session::getUser()){
+            $postManager = new PostManager();
+            $post = $postManager->findOneById($id);
+            $user = Session::getUser();
+            var_dump($user); exit;
+            if ($user->getId() == $post->getUser()->getId()){
+                $postManager->delete($id);  
+            } 
+            $this->redirectTo("forum", "listPostsByTopic", $post->getTopic()->getId());exit;
+            
+        } $this->redirectTo("home", "index");exit;
+    }
+
     public function addTopic($id){
         
-        if(isset($_POST['submit'])){
+        if(isset($_POST['submit']) && (Session::getUser())){
             $title = filter_input(INPUT_POST, "title", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $text = filter_input(INPUT_POST, "text", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            
+            $user = Session::getUser();
             $dataTopic = [
                 "title" => $title,
                 "creationDate" => date("Y-m-d H:i:s"),
-                "user_id" => 2,
+                "user_id" => $user->getId(),
                 "category_id" => $id
             ];
             
@@ -100,7 +115,7 @@ class ForumController extends AbstractController implements ControllerInterface{
             $dataPost = [
                 "text" => $text, 
                 "creationDate" => date("Y-m-d H:i:s"),
-                "user_id" => 2, 
+                "user_id" => $user->getId(), 
                 "topic_id" => $topic
             ];
             $postManager = new PostManager();

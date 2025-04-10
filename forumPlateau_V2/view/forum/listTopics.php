@@ -1,4 +1,5 @@
 <?php
+    use App\Session as Session;
     $category = $result["data"]['category']; 
     $topics = $result["data"]['topics']; 
 ?>
@@ -9,6 +10,8 @@
 foreach($topics as $topic ){ ?>
     <p><a href="index.php?ctrl=forum&action=listPostsByTopic&id=<?=$topic->getId() ?>"><?= $topic ?></a> par <?= $topic->getUser() ?> le <?= $topic->getCreationDate() ?></p>
 <?php }
+
+if (Session::getUser()){
 ?>
 <h2>Ajoutez un sujet</h2>
 <form action="index.php?ctrl=forum&action=addTopic&id=<?= $category->getId() ?>" method="post">
@@ -18,3 +21,9 @@ foreach($topics as $topic ){ ?>
     <textarea name="text" id="text" cols="50" rows="5"></textarea>
     <button type="submit" name="submit">Envoyer</button>
 </form>
+<?php
+} else {
+    ?>
+<h2>Vous devez vous connecté pour ajouter un sujet</h2>
+    <?php
+}
