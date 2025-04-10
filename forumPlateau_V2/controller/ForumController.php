@@ -87,8 +87,7 @@ class ForumController extends AbstractController implements ControllerInterface{
             $postManager = new PostManager();
             $post = $postManager->findOneById($id);
             $user = Session::getUser();
-            var_dump($user); exit;
-            if ($user->getId() == $post->getUser()->getId()){
+            if ($user->getId() == $post->getUser()->getId() || Session::isAdmin()){
                 $postManager->delete($id);  
             } 
             $this->redirectTo("forum", "listPostsByTopic", $post->getTopic()->getId());exit;
@@ -124,5 +123,18 @@ class ForumController extends AbstractController implements ControllerInterface{
             $this->redirectTo("forum", "listTopicsByCategory", $id);
 
         }
+    }
+
+    public function deleteTopic($id){
+        if (isset($_POST['submit']) && Session::getUser()){
+            $topicManager = new TopicManager();
+            $topic = $topicManager->findOneById($id);
+            $user = Session::getUser();
+            if ($user->getId() == $topic->getUser()->getId() || Session::isAdmin()){
+                $topicManager->delete($id);  
+            } 
+            $this->redirectTo("forum", "listTopicsByCategory", $topic->getCategory()->getId());exit;
+            
+        } $this->redirectTo("home", "index");exit;
     }
 }

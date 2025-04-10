@@ -9,7 +9,13 @@
 <?php
 foreach($topics as $topic ){ ?>
     <p><a href="index.php?ctrl=forum&action=listPostsByTopic&id=<?=$topic->getId() ?>"><?= $topic ?></a> par <?= $topic->getUser() ?> le <?= $topic->getCreationDate() ?></p>
+    <?php if (Session::getUser() && Session::getUser() == $topic->getUser() || Session::isAdmin()){
+    ?>
+    <form action="index.php?ctrl=forum&action=deleteTopic&id=<?= $topic->getId() ?>" method="post">
+        <input type="submit" name="submit" value="Supprimer message">
+    </form>
 <?php }
+}
 
 if (Session::getUser()){
 ?>

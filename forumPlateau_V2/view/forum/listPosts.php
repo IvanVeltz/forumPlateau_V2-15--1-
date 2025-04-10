@@ -11,10 +11,16 @@ foreach($posts as $post ){?>
 
     <p><?= $post ?> par <?= $post->getUser() ?> le <?= $post->getCreationDate() ?></p>
     <?php
-    if (Session::getUser() && Session::getUser() == $post->getUser()){
+    if (Session::getUser() && Session::getUser() == $post->getUser() || Session::isAdmin()){
     ?>
     <form action="index.php?ctrl=forum&action=deletePost&id=<?= $post->getId() ?>" method="post">
         <input type="submit" name="submit" value="Supprimer message">
+    </form>
+    <form action="index.php?ctrl=forum&action=updatePost&id=<?= $post->getId() ?>" method="post">
+        <button type="button">Modifier le message</button>
+        <label for="text">Votre message</label>
+        <textarea name="text" id="text" cols="50" rows="1"></textarea>
+        <input type="submit" name="submit" id="submit" value="Valider">
     </form>
 <?php }
 }
