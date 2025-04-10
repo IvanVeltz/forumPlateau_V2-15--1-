@@ -42,6 +42,8 @@ abstract class Manager{
         );
     }
 
+    
+
     //$data = ['username' => 'Squalli', 'password' => 'dfsyfshfbzeifbqefbq', 'email' => 'sql@gmail.com'];
 
     public function add($data){
