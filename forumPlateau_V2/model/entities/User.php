@@ -14,6 +14,8 @@ final class User extends Entity{
     private $password;
     private $email;
     private $role;
+    private $isBan;
+    private $dateBan;
 
     public function __construct($data){         
         $this->hydrate($data);        
@@ -78,6 +80,24 @@ final class User extends Entity{
 
     public function setEmail($email){
         $this->email = $email;
+        return $this;
+    }
+
+    public function getDateBan(){
+        return $this->dateBan;
+    }
+
+    public function setDateBan($dateBan){
+        $this->dateBan = $dateBan;
+        return $this;
+    }
+
+    public function getISBan(){
+        return $this->isBan;
+    }
+
+    public function setIsBan($isBan){
+        $this->isBan = $isBan;
         return $this;
     }
 
