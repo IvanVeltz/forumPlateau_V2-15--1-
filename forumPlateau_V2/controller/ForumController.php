@@ -84,6 +84,7 @@ class ForumController extends AbstractController implements ControllerInterface{
 
     public function deletePost($id){
         if (isset($_POST['submit']) && Session::getUser()){
+            
             $postManager = new PostManager();
             $post = $postManager->findOneById($id);
             $user = Session::getUser();
@@ -92,6 +93,26 @@ class ForumController extends AbstractController implements ControllerInterface{
             } 
             $this->redirectTo("forum", "listPostsByTopic", $post->getTopic()->getId());exit;
             
+        } $this->redirectTo("home", "index");exit;
+    }
+
+    public function updatePost($id){
+        if (isset($_POST['submit']) && Session::getUser()){
+            $postManager = new PostManager();
+            $post = $postManager->findOneById($id);
+            $user = Session::getUser();
+            if ($user->getId() == $post->getUser()->getId()){
+                $postManager->delete($id);
+                $text = filter_input(INPUT_POST, "text", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $data = [
+                    "text" => $text, 
+                    "creationDate" => date("Y-m-d H:i:s"),
+                    "user_id" => $user->getId(), 
+                    "topic_id" => $post->getTopic()->getId()
+                ];
+                $postManager->add($data);
+            }
+            $this->redirectTo("forum", "listPostsByTopic", $post->getTopic()->getId());exit;
         } $this->redirectTo("home", "index");exit;
     }
 
@@ -130,7 +151,7 @@ class ForumController extends AbstractController implements ControllerInterface{
             $topicManager = new TopicManager();
             $topic = $topicManager->findOneById($id);
             $user = Session::getUser();
-            if ($user->getId() == $topic->getUser()->getId() || Session::isAdmin()){
+            if (($user->getId() == $topic->getUser()->getId()) || Session::isAdmin()){
                 $topicManager->delete($id);  
             } 
             $this->redirectTo("forum", "listTopicsByCategory", $topic->getCategory()->getId());exit;

@@ -18,6 +18,6 @@ textarea {
     resize: none;
 }
 
-form button{
+form button, form #submit{
     width: fit-content;
 }
