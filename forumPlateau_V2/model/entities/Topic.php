@@ -89,6 +89,15 @@ final class Topic extends Entity{
         return $this;
     }
 
+    public function getClosed(){
+        return $this->closed;
+    }
+
+    public function setClosed($closed){
+        $this->closed = $closed;
+        return $this;
+    }
+
     public function __toString(){
         return $this->title;
     }

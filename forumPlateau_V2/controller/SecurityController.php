@@ -29,6 +29,20 @@ class SecurityController extends AbstractController{
         $this->redirectTo("home", "index");exit;
     }
 
+    public function profile (){
+        if (SESSION::getUser()){
+            $userId = SESSION::getUser()->getId();
+            $userManager = new UserManager();
+
+
+            return [
+                "view" => VIEW_DIR."security/profil.php",
+                "meta_description" => "Profil de l'utilisateur",
+
+            ]
+        }
+    }
+
     public function registerUser () {
         if(isset($_POST['submit'])){
             

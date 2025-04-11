@@ -28,4 +28,17 @@ class TopicManager extends Manager{
             $this->className
         );
     }
+
+    public function closeTopicById($id){
+
+        $sql = "UPDATE ".$this->tableName." t
+            SET t.closed = 1
+            WHERE t.id_topic = :id
+        ";
+
+        return $this->getOneOrNullResult(
+            DAO::update($sql, ['id' => $id]),
+            $this->className
+        );
+    }
 }

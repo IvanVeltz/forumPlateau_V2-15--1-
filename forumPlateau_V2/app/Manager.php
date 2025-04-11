@@ -68,6 +68,24 @@ abstract class Manager{
             die();
         }
     }
+
+    public function update($id, $data) {
+        // Vérifier que $data contient bien un seul élément
+        
+        $key = array_key_first($data); // Récupère la première clé
+        $value = $data[$key]; // Récupère la première valeur
+
+        $sql = "UPDATE ".$this->tableName.
+                " SET $key = :value 
+                WHERE id_".$this->tableName." = :id";
+
+        try {
+            return DAO::update($sql, ['value' => $value, 'id' => $id]);
+        } catch (\PDOException $e) {
+            error_log($e->getMessage());
+            return false;
+        }
+    }
     
     public function delete($id){
         $sql = "DELETE FROM ".$this->tableName."

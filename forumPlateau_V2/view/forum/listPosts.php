@@ -19,25 +19,34 @@ foreach($posts as $post ){?>
     <?php
     }
     if ((Session::getUser() && Session::getUser() == $post->getUser())){
+        if (!$topic->getClosed()){
     ?>
     <form action="index.php?ctrl=forum&action=updatePost&id=<?= $post->getId() ?>" method="post">
         <button type="button">Modifier le message</button>
         <label for="text">Votre message</label>
-        <textarea name="text" id="text" cols="50" rows="1"><?= $post ?></textarea>
+        <textarea name="text" cols="50" rows="1"><?= $post ?></textarea>
         <input type="submit" name="submit" id="submit" value="Valider">
     </form>
-<?php }
+<?php 
+        } 
+}
 }
 if (Session::getUser()){
+    if (!$topic->getClosed()){
 ?>
 
-<h2>Ajoutez un message</h2>
-<form action="index.php?ctrl=forum&action=addPost&id=<?= $topic->getId() ?>" method="post">
-    <label for="text">Votre message</label>
-    <textarea name="text" id="text" cols="50" rows="1"></textarea>
-    <button type="submit" name="submit">Envoyer</button>
-</form>
-<?php
+        <h2>Ajoutez un message</h2>
+        <form action="index.php?ctrl=forum&action=addPost&id=<?= $topic->getId() ?>" method="post">
+            <label for="text">Votre message</label>
+            <textarea name="text" id="text" cols="50" rows="1"></textarea>
+            <button type="submit" name="submit">Envoyer</button>
+        </form>
+        <?php
+    } else {
+        ?>
+        <h2>Ce sujet est bloqué</h2>
+        <?php
+    }
 } else {
     ?>
 <h2>Vous devez vous connecté pour écrire un message</h2>

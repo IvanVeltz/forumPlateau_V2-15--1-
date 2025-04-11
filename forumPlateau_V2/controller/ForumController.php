@@ -4,6 +4,7 @@ namespace Controller;
 use App\Session;
 use App\AbstractController;
 use App\ControllerInterface;
+use App\DAO;
 use Model\Managers\CategoryManager;
 use Model\Managers\TopicManager;
 use Model\Managers\PostManager;
@@ -108,6 +109,34 @@ class ForumController extends AbstractController implements ControllerInterface{
         } $this->redirectTo("home", "index");exit;
     }
 
+    public function updateTopic($id){
+        if(isset($_POST['submit']) && Session::getUser()){
+            $topicManager = new TopicManager();
+            $topic = $topicManager->findOneById($id);
+            $user = Session::getUser();
+            if ($user->getId() == $topic->getUser()->getId()){
+                $title = filter_input(INPUT_POST, "title", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $data = [
+                    "title" => $title
+                ];
+                $t = $topicManager->update($id, $data);
+            }
+            $this->redirectTo("forum", "listTopicsByCategory", $topic->getCategory()->getId());exit;
+        } $this->redirectTo("home", "index");exit;
+    }
+
+    public function closeTopic($id){
+        if (isset($_POST['submit']) && Session::getUser()){
+            $user = Session::getUser();
+            $topicManager = new TopicManager();
+            $topic = $topicManager->findOneById($id);
+            if (($user->getId() == $topic->getUser()->getId()) || Session::isAdmin()){
+                $topicManager->closeTopicById($id);  
+            } 
+            $this->redirectTo("forum", "listTopicsByCategory", $topic->getCategory()->getId());exit;
+        } $this->redirectTo("home", "index");exit;
+    }
+
     public function addPost($id){
         
         if(isset($_POST['submit']) && (Session::getUser())){
@@ -156,15 +185,11 @@ class ForumController extends AbstractController implements ControllerInterface{
             $post = $postManager->findOneById($id);
             $user = Session::getUser();
             if ($user->getId() == $post->getUser()->getId()){
-                $postManager->delete($id);
                 $text = filter_input(INPUT_POST, "text", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 $data = [
-                    "text" => $text, 
-                    "creationDate" => date("Y-m-d H:i:s"),
-                    "user_id" => $user->getId(), 
-                    "topic_id" => $post->getTopic()->getId()
+                    "text" => $text
                 ];
-                $postManager->add($data);
+                $postManager->update($id, $data);
             }
             $this->redirectTo("forum", "listPostsByTopic", $post->getTopic()->getId());exit;
         } $this->redirectTo("home", "index");exit;
