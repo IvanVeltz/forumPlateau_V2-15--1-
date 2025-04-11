@@ -5,6 +5,8 @@ use App\AbstractController;
 use App\ControllerInterface;
 use App\Session;
 use Model\Managers\UserManager;
+use Model\Managers\PostManager;
+use Model\Managers\TopicManager;
 
 class SecurityController extends AbstractController{
     // contiendra les méthodes liées à l'authentification : register, login et logout
@@ -29,19 +31,7 @@ class SecurityController extends AbstractController{
         $this->redirectTo("home", "index");exit;
     }
 
-    public function profile (){
-        if (SESSION::getUser()){
-            $userId = SESSION::getUser()->getId();
-            $userManager = new UserManager();
-
-
-            return [
-                "view" => VIEW_DIR."security/profil.php",
-                "meta_description" => "Profil de l'utilisateur",
-
-            ]
-        }
-    }
+    
 
     public function registerUser () {
         if(isset($_POST['submit'])){
@@ -103,5 +93,34 @@ class SecurityController extends AbstractController{
         } else {
             $this->redirectTo("security", "login");exit;
         }
+    }
+    public function profile (){
+        
+        $user = Session::getUser();
+        $postManager = new PostManager();
+        $postsByUser = $postManager->findPostsByUser($user->getId());
+        $topicManager = new TopicManager();
+        $topicsByUser = $topicManager->findTopicsByUser($user->getId());
+        $countPosts = 0;
+        if($postsByUser){
+            foreach($postsByUser as $post){
+                $countPosts++;
+            }
+        }
+        $countTopics = 0;
+        if($topicsByUser){
+            foreach($topicsByUser as $topic){
+                $countTopics++;
+            }
+        }
+
+        return [
+                "view" => VIEW_DIR."security/profile.php",
+                "meta_description" => "Profil de l'utilisateur",
+                "data" => [
+                    "topics" => $countTopics,
+                    "posts" => $countPosts
+                ]
+        ];
     }
 }
