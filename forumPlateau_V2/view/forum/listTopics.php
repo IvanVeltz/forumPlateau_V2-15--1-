@@ -12,7 +12,7 @@ foreach($topics as $topic ){ ?>
     <?php if (Session::getUser() && Session::getUser() == $topic->getUser() || Session::isAdmin()){
     ?>
     <form action="index.php?ctrl=forum&action=deleteTopic&id=<?= $topic->getId() ?>" method="post">
-        <input type="submit" name="submit" value="Supprimer message">
+        <input type="submit" name="submit" value="Supprimer le sujet">
     </form>
 <?php }
 }

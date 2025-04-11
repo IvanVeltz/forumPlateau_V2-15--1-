@@ -62,59 +62,7 @@ class ForumController extends AbstractController implements ControllerInterface{
 
     }
 
-    public function addPost($id){
-        
-        if(isset($_POST['submit']) && (Session::getUser())){
-            $text = filter_input(INPUT_POST, "text", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $user = Session::getUser();
-            $data = [
-                "text" => $text, 
-                "creationDate" => date("Y-m-d H:i:s"),
-                "user_id" => $user->getId(), 
-                "topic_id" => $id
-            ];
-            $postManager = new PostManager();
-            $postManager->add($data);
-
-            // On rappele la vue 
-            $this->redirectTo("forum", "listPostsByTopic", $id);
-
-        }
-    }
-
-    public function deletePost($id){
-        if (isset($_POST['submit']) && Session::getUser()){
-            
-            $postManager = new PostManager();
-            $post = $postManager->findOneById($id);
-            $user = Session::getUser();
-            if ($user->getId() == $post->getUser()->getId() || Session::isAdmin()){
-                $postManager->delete($id);  
-            } 
-            $this->redirectTo("forum", "listPostsByTopic", $post->getTopic()->getId());exit;
-            
-        } $this->redirectTo("home", "index");exit;
-    }
-
-    public function updatePost($id){
-        if (isset($_POST['submit']) && Session::getUser()){
-            $postManager = new PostManager();
-            $post = $postManager->findOneById($id);
-            $user = Session::getUser();
-            if ($user->getId() == $post->getUser()->getId()){
-                $postManager->delete($id);
-                $text = filter_input(INPUT_POST, "text", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-                $data = [
-                    "text" => $text, 
-                    "creationDate" => date("Y-m-d H:i:s"),
-                    "user_id" => $user->getId(), 
-                    "topic_id" => $post->getTopic()->getId()
-                ];
-                $postManager->add($data);
-            }
-            $this->redirectTo("forum", "listPostsByTopic", $post->getTopic()->getId());exit;
-        } $this->redirectTo("home", "index");exit;
-    }
+    
 
     public function addTopic($id){
         
@@ -150,12 +98,75 @@ class ForumController extends AbstractController implements ControllerInterface{
         if (isset($_POST['submit']) && Session::getUser()){
             $topicManager = new TopicManager();
             $topic = $topicManager->findOneById($id);
+            var_dump($id);
             $user = Session::getUser();
             if (($user->getId() == $topic->getUser()->getId()) || Session::isAdmin()){
                 $topicManager->delete($id);  
             } 
             $this->redirectTo("forum", "listTopicsByCategory", $topic->getCategory()->getId());exit;
             
+        } $this->redirectTo("home", "index");exit;
+    }
+
+    public function addPost($id){
+        
+        if(isset($_POST['submit']) && (Session::getUser())){
+            $text = filter_input(INPUT_POST, "text", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $user = Session::getUser();
+            $data = [
+                "text" => $text, 
+                "creationDate" => date("Y-m-d H:i:s"),
+                "user_id" => $user->getId(), 
+                "topic_id" => $id
+            ];
+            $postManager = new PostManager();
+            $postManager->add($data);
+
+            // On rappele la vue 
+            $this->redirectTo("forum", "listPostsByTopic", $id);
+
+        }
+    }
+
+    public function deletePost($id){
+        if (isset($_POST['submit']) && Session::getUser()){
+            
+            $postManager = new PostManager();
+            $post = $postManager->findOneById($id);
+            $topicId = $post->getTopic()->getId();
+            $posts = $postManager->findPostsByTopic($topicId);
+            $posts = iterator_to_array($posts);
+            $user = Session::getUser();
+            if ($user->getId() == $post->getUser()->getId() || Session::isAdmin()){
+                if (count($posts) > 1){
+                    $postManager->delete($id);
+                } else {
+                    $this->deleteTopic($topicId);
+                    $this->redirectTo("home", "index");exit;
+                }  
+            } 
+            $this->redirectTo("forum", "listPostsByTopic", $topicId);exit;
+            
+        } $this->redirectTo("home", "index");exit;
+    }
+
+    public function updatePost($id){
+        if (isset($_POST['submit']) && Session::getUser()){
+            $postManager = new PostManager();
+            $post = $postManager->findOneById($id);
+            $user = Session::getUser();
+            if ($user->getId() == $post->getUser()->getId()){
+                $postManager->delete($id);
+                $text = filter_input(INPUT_POST, "text", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $data = [
+                    "text" => $text, 
+                    "creationDate" => date("Y-m-d H:i:s"),
+                    "user_id" => $user->getId(), 
+                    "topic_id" => $post->getTopic()->getId()
+                ];
+                $postManager->add($data);
+            }
+            $this->redirectTo("forum", "listPostsByTopic", $post->getTopic()->getId());exit;
         } $this->redirectTo("home", "index");exit;
     }
 }
