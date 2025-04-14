@@ -2,12 +2,11 @@
     use App\Session as Session;
     $topic = $result["data"]['topic']; 
     $posts = $result["data"]['posts']; 
-?>
 
-<h1><?= $topic->getTitle() ?></h1>
-
-<?php
 if(Session::getUser()){
+    ?>
+    <h1><?= $topic->getTitle() ?></h1>
+    <?php
     if (!Session::getUser()->getIsBan()){
     foreach($posts as $post ){?>
 
@@ -62,7 +61,8 @@ if(Session::getUser()){
     <h2>Vous êtes ban et n'avez pas accès</h2>
     <?php
 }} else {
+    Session::addFlash("error", "Vous devez vous connecter pour avoir accès");
     ?>
-    <h2>Vous devez vous connecter pour avoir accès</h2>
+    <h2><?= Session::getFlash("error"); ?></h2>
         <?php
 }

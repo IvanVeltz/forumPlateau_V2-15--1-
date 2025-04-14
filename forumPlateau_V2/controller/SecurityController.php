@@ -79,7 +79,6 @@ class SecurityController extends AbstractController{
                 if($user){
                     $hash = $user->getPassword();
                     if(password_verify($password, $hash)){
-                        Session::setUser($user);
                         $now = new \DateTime();
                         $dateBan = new \DateTime($user->getDateBan()); // Convertir la chaîne en DateTime
                         if ($dateBan <= $now) { // Comparaison correcte entre objets DateTime
@@ -88,7 +87,10 @@ class SecurityController extends AbstractController{
                                 'dateBan' => null
                             ];
                             $userManager->update($user->getId(), $data);
+                            $user->setIsBan(0);
+                            
                         }
+                        Session::setUser($user);
                         $this->redirectTo("home", "index");exit;
                     } else {
                         $this->redirectTo("security", "login");exit;
