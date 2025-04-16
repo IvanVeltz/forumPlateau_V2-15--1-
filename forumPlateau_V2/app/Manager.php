@@ -83,7 +83,6 @@ abstract class Manager{
                 $updateValue.=", ";
             }
         }
-        
 
         $sql = "UPDATE ".$this->tableName.
                 " SET $updateValue 
