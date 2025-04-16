@@ -22,7 +22,7 @@ if(Session::getUser()){
         if ((Session::getUser() && Session::getUser() == $post->getUser()) || Session::isAdmin()){
         ?>
         <form action="index.php?ctrl=forum&action=deletePost&id=<?= $post->getId() ?>" method="post">
-            <input type="submit" name="submit" value="Supprimer message">
+            <input type="submit" name="submit" value="Supprimer message" class="delete-btn">
         </form>
         <?php
         }

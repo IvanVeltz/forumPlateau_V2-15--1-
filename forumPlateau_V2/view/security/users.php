@@ -23,7 +23,7 @@ if (Session::isAdmin()){
                 <input type="submit" name="submit" value="submit">
             </form>
             <form action="index.php?ctrl=security&action=deleteUser&id=<?=$user->getId()?>" method="post">
-                <input type="submit" name="submit" value="Supprimer utilisateur">
+                <input type="submit" name="submit" value="Supprimer utilisateur" class="delete-btn">
             </form>
             <?php
         }

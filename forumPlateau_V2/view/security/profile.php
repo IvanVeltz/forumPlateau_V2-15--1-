@@ -17,8 +17,8 @@ if($user){
         if(!$user->hasRole('ROLE_ADMIN')){
             ?>
             <form action="index.php?ctrl=security&action=deleteUser&id=<?= $user->getId(); ?>" method="post">
-                <input type="submit" name="submit" value="Supprimer votre profil">
+                <input type="submit" name="submit" value="Supprimer votre profil" class="delete-btn">
             </form>
             <?php
         }
-} 
+}
