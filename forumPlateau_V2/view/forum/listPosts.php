@@ -63,6 +63,6 @@ if(Session::getUser()){
 }} else {
     Session::addFlash("error", "Vous devez vous connecter pour avoir accès");
     ?>
-    <h2><?= Session::getFlash("error"); ?></h2>
-        <?php
+        <h3 class="message" style="color: red"><?= Session::getFlash("error"); ?></h3>
+    <?php
 }

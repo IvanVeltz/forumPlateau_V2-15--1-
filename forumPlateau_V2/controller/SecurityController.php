@@ -151,31 +151,33 @@ class SecurityController extends AbstractController{
     }
 
     public function ban($id){
-        $durationBan = filter_input(INPUT_POST, "durationBan", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        if($durationBan && Session::isAdmin()){
-            $dateBan = new \DateTime();
-        
-            switch ($durationBan) {
-                case 'day':
-                    $dateBan->modify('+1 day');
-                    break;
-                case 'week':
-                    $dateBan->modify('+7 days');
-                    break;
-                case 'month':
-                    $dateBan->modify('+1 month');
-                    break;
-                case 'permanent':
-                    return "9999-12-31 23:59:59";
-                default:
-                    return null;
+        if(isset($_POST['submit'])){
+            $durationBan = filter_input(INPUT_POST, "durationBan", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            if($durationBan && Session::isAdmin()){
+                $dateBan = new \DateTime();
+            
+                switch ($durationBan) {
+                    case 'day':
+                        $dateBan->modify('+1 day');
+                        break;
+                    case 'week':
+                        $dateBan->modify('+7 days');
+                        break;
+                    case 'month':
+                        $dateBan->modify('+1 month');
+                        break;
+                    case 'permanent':
+                        return "9999-12-31 23:59:59";
+                    default:
+                        return null;
+                }
+                $userManager = new UserManager();
+                $data = [
+                    'isBan' => 1,
+                    'dateBan' => $dateBan->format('Y-m-d H:i:s')
+                ];
+                $userManager->update($id, $data);
             }
-            $userManager = new UserManager();
-            $data = [
-                'isBan' => 1,
-                'dateBan' => $dateBan->format('Y-m-d H:i:s')
-            ];
-            $userManager->update($id, $data);
         }
         $this->redirectTo('security','users');
     }

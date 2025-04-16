@@ -14,7 +14,7 @@ if($user){
     <p>Nombre de sujets créés : <?=$topics ?> </p>
     <p>Nombre de messages créés : <?=$posts ?> </p>
     <?php
-        if(!$user->hasRole('ROLE_ADMIN')){
+        if(!$user->hasRole('ROLE_ADMIN') || Session::isAdmin()){
             ?>
             <form action="index.phpctrl=security&action=deleteUser&id=<?= $user->getId(); ?>" method="post">
                 <input type="submit" name="submit" value="Supprimer votre profil">

@@ -70,17 +70,27 @@ abstract class Manager{
     }
 
     public function update($id, $data) {
-        // Vérifier que $data contient bien un seul élément
         
-        $key = array_key_first($data); // Récupère la première clé
-        $value = $data[$key]; // Récupère la première valeur
+        $updateValue = " ";
+        $lastKey = array_key_last($data);
+        foreach($data as $key => $value){
+            if (gettype($value) === "integer"){
+                $updateValue.=$key." = ".$value;
+            } else {
+                $updateValue.=$key." = '".$value."'";
+            }
+            if($key != $lastKey){
+                $updateValue.=", ";
+            }
+        }
+        
 
         $sql = "UPDATE ".$this->tableName.
-                " SET $key = :value 
+                " SET $updateValue 
                 WHERE id_".$this->tableName." = :id";
-
+        
         try {
-            return DAO::update($sql, ['value' => $value, 'id' => $id]);
+            return DAO::update($sql, ['id' => $id]);
         } catch (\PDOException $e) {
             error_log($e->getMessage());
             return false;
