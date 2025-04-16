@@ -18,7 +18,7 @@ if (Session::isAdmin()){
                     <option value="day">1 jour</option>
                     <option value="week">1 semaine</option>
                     <option value="month">1 mois</option>
-                    <option value="permanent">Permannet</option>
+                    <option value="permanent">Permannent</option>
                 </select>
                 <input type="submit" name="submit" value="submit">
             </form>

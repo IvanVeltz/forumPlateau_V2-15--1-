@@ -11,6 +11,7 @@ use Model\Managers\TopicManager;
 class SecurityController extends AbstractController{
     // contiendra les méthodes liées à l'authentification : register, login et logout
 
+    // Affiche la page d'inscription
     public function register () {
         return [
              "view" => VIEW_DIR."security/register.php",
@@ -19,6 +20,7 @@ class SecurityController extends AbstractController{
          ];
     }
 
+    // Affiche la page de connexion
     public function login () {
         return [
             "view" => VIEW_DIR."security/login.php",
@@ -26,16 +28,17 @@ class SecurityController extends AbstractController{
             "data" => []
         ];
     }
+
+    // Deconnecte l'utilisateur
     public function logout () {
-        unset($_SESSION['user']);
+        unset($_SESSION['user']); // unset() détruit la ou les variables dont le nom a été passé en argument
         $this->redirectTo("home", "index");exit;
     }
 
-    
-
+    // Inscription utilsateur
     public function registerUser () {
         if(isset($_POST['submit'])){
-            
+            // filter_input récupère une variable externe et la filtre, ici on filtre les varibale du formulaire
             $nickName = filter_input(INPUT_POST, "nickName", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $email = filter_input(INPUT_POST, "email", FILTER_SANITIZE_EMAIL, FILTER_VALIDATE_EMAIL);
             $pass1 = filter_input(INPUT_POST, "pass1", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -43,16 +46,17 @@ class SecurityController extends AbstractController{
             
             if($nickName && $email && $pass1 && $pass2){
                 $userManager =  new UserManager();
-                $user = $userManager->findOneByEmail($email);
+                $user = $userManager->findOneByEmail($email);// Trouver si un utilisateur a deja cet email
             
                 if($user){
-                    $this->redirectTo("security", "register");
+                    $this->redirectTo("security", "register"); // Si oui, on ne fait rien et retourne sur la page d'inscription
                 } else {
+                    // Si non, on s'assure que les mdp sont les mêmes et on ajoute l'utilisateur à la bdd
                     if ($pass1 == $pass2 && strlen($pass1) >= 5){
                         $dataUser = [
                             'nickName' => $nickName,
                             'email' => $email,
-                            'password' => password_hash($pass1, PASSWORD_DEFAULT),
+                            'password' => password_hash($pass1, PASSWORD_DEFAULT), // On créé une clé de hachage pour le mot de passe
                             'registrationDate' => date("Y-m-d H:i:s")
                         ];
                         $userManager->add($dataUser);
@@ -67,6 +71,7 @@ class SecurityController extends AbstractController{
         }
     }
 
+    // Connexion de l'utilisateur
     public function loginUser(){
         if(isset($_POST['submit'])){
 
@@ -78,19 +83,19 @@ class SecurityController extends AbstractController{
                 $user = $userManager->findOneByEmail($email);
                 if($user){
                     $hash = $user->getPassword();
-                    if(password_verify($password, $hash)){
+                    if(password_verify($password, $hash)){ // On vérifie qu'un mot de passe correspond au hachage
                         $now = new \DateTime();
-                        $dateBan = new \DateTime($user->getDateBan()); // Convertir la chaîne en DateTime
-                        if ($dateBan <= $now) { // Comparaison correcte entre objets DateTime
+                        $dateBan = new \DateTime($user->getDateBan()); // On recupere la date de ban au format DateTime
+                        if (isset($dateBan) && $dateBan <= $now) { // Si la dateBan existe et qu'elle est depassé
                             $data = [
                                 'isBan' => 0,
                                 'dateBan' => null
                             ];
-                            $userManager->update($user->getId(), $data);
-                            $user->setIsBan(0);
-                            
+                            $userManager->update($user->getId(), $data); // On débanne l'utilisateur en bdd
+                            $user->setIsBan(0); // On modifie l'user en cours
                         }
-                        Session::setUser($user);
+                        Session::setUser($user); // On modifie l'user en session
+                        
                         $this->redirectTo("home", "index");exit;
                     } else {
                         $this->redirectTo("security", "login");exit;
@@ -105,23 +110,25 @@ class SecurityController extends AbstractController{
             $this->redirectTo("security", "login");exit;
         }
     }
+
+    // Page du profil d'un utilisateur
     public function profile (){
         
         $user = Session::getUser();
         $postManager = new PostManager();
-        $postsByUser = $postManager->findPostsByUser($user->getId());
+        $postsByUser = $postManager->findPostsByUser($user->getId()); // On recupere les messages d'un utilisateur
         $topicManager = new TopicManager();
-        $topicsByUser = $topicManager->findTopicsByUser($user->getId());
+        $topicsByUser = $topicManager->findTopicsByUser($user->getId()); // On recupere les sujets d'un utilisateur
         $countPosts = 0;
         if($postsByUser){
             foreach($postsByUser as $post){
-                $countPosts++;
+                $countPosts++; // On compte le nombre de messages d'un utilisateur
             }
         }
         $countTopics = 0;
         if($topicsByUser){
             foreach($topicsByUser as $topic){
-                $countTopics++;
+                $countTopics++; // On compte le nombre de sujets d'un utilisateur
             }
         }
 
@@ -135,11 +142,12 @@ class SecurityController extends AbstractController{
         ];
     }
 
+    // Liste des utilisateurs
     public function users(){
-        $this->restrictTo("ROLE_ADMIN");
+        $this->restrictTo("ROLE_ADMIN"); // on limite l'accès à l'admin
 
         $manager = new UserManager();
-        $users = $manager->findAll(['nickName', 'ASC']);
+        $users = $manager->findAll(['nickName', 'ASC']); // On récupere tous les utilisateurs par ordre alphabetique selon le pseudo
 
         return [
             "view" => VIEW_DIR."security/users.php",
@@ -150,13 +158,14 @@ class SecurityController extends AbstractController{
         ];
     }
 
+    // Ban d'un utilisateur
     public function ban($id){
         if(isset($_POST['submit'])){
             $durationBan = filter_input(INPUT_POST, "durationBan", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             if($durationBan && Session::isAdmin()){
-                $dateBan = new \DateTime();
+                $dateBan = new \DateTime(); // On créé une variable au format date
             
-                switch ($durationBan) {
+                switch ($durationBan) { // On compare la variable passé en input et on modifie dateBan en consequence
                     case 'day':
                         $dateBan->modify('+1 day');
                         break;
@@ -167,7 +176,8 @@ class SecurityController extends AbstractController{
                         $dateBan->modify('+1 month');
                         break;
                     case 'permanent':
-                        return "9999-12-31 23:59:59";
+                        $dateBan->modify('+500 year');
+                        break;
                     default:
                         return null;
                 }
@@ -176,13 +186,15 @@ class SecurityController extends AbstractController{
                     'isBan' => 1,
                     'dateBan' => $dateBan->format('Y-m-d H:i:s')
                 ];
-                $userManager->update($id, $data);
+                $userManager->update($id, $data); // On modifie le table user avec l'id de l'utilisateur à ban et sa durée
             }
         }
         $this->redirectTo('security','users');
     }
 
+    // Suppression d'un utilisateur
     public function deleteUser($id){
+        // On verifie si le formulaire est bien passé, et si c'est l'admin ou l'utilisateur même qui veut supprimer son compte
         if(isset($_POST['submit']) && (Session::isAdmin() || Session::getUser()->getId() === (int)$id )){
             $userManager = new UserManager();
             $userManager->delete($id);
