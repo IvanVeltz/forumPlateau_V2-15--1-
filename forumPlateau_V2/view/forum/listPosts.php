@@ -11,8 +11,8 @@ if(Session::getUser()){
     foreach($posts as $post ){?>
 
         <p><?= $post ?> par 
-        <?php if ($post->getUser()->getIsBan()){
-            echo "Utilsateur inconnu";
+        <?php if (!$post->getUser()){
+            echo "Utilisateur anonoyme";
         } else{
             echo $post->getUser();
         }

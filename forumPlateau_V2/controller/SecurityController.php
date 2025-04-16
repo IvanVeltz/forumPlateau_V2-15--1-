@@ -181,4 +181,14 @@ class SecurityController extends AbstractController{
         }
         $this->redirectTo('security','users');
     }
+
+    public function deleteUser($id){
+        var_dump($id);
+        if(isset($_POST['submit']) && Session::isAdmin()){
+            $userManager = new UserManager();
+            $postManager = 
+            $userManager->delete($id);
+        }
+        $this->redirectTo('security', 'users');
+    }
 }
